@@ -1,0 +1,105 @@
+/*
+4. 
+사원번호를 입력(치환변수& 사용)할 경우
+부서별로 구분하여 각각의 테이블에 입력하는 PL/SQL 블록을 작성하시오.
+단, 해당 부서가 없는 사원은 emp00 테이블에 입력하시오.
+   : 부서번호10->emp10, 부서번호20->emp20 ....
+*/
+
+
+-- 1) INSERT문 반복
+DECLARE
+    v_empid employees.employee_id%TYPE := &사원번호;
+    v_ename employees.first_name%TYPE;
+    v_hdate employees.hire_date%TYPe;
+    v_deptid employees.department_id%TYPE;
+BEGIN
+    SELECT first_name, hire_date, department_id
+    INTO v_ename, v_hdate, v_deptid
+    FROM employees
+    WHERE employee_id = v_empid;
+    
+    IF v_deptid = 10 THEN
+        INSERT INTO emp10
+        VALUES (v_empid, v_ename, v_hdate);
+    ELSIF v_deptid = 20 THEN
+        INSERT INTO emp20
+        VALUES (v_empid, v_ename, v_hdate);
+    ELSIF v_deptid = 30 THEN
+        INSERT INTO emp30
+        VALUES (v_empid, v_ename, v_hdate);
+    ELSIF v_deptid = 40 THEN
+        INSERT INTO emp40
+        VALUES (v_empid, v_ename, v_hdate);
+    ELSIF v_deptid = 50 THEN
+        INSERT INTO emp50
+        VALUES (v_empid, v_ename, v_hdate);
+    ELSE
+        INSERT INTO emp00
+        VALUES (v_empid, v_ename, v_hdate);
+    END IF;    
+END;
+/
+
+SELECT * FROM emp00;
+
+
+-- 2) 동적 쿼리
+DECLARE
+    v_empid employees.employee_id%TYPE := &사원번호;
+    v_ename employees.first_name%TYPE;
+    v_hdate employees.hire_date%TYPe;
+    v_deptid employees.department_id%TYPE;
+    v_sql VARCHAR2(100);
+BEGIN
+    SELECT first_name, hire_date, TRUNC(department_id/10)
+    INTO v_ename, v_hdate, v_deptid
+    FROM employees
+    WHERE employee_id = v_empid;
+    
+    IF  v_deptid BETWEEN 1 AND 5 THEN
+        v_sql := 'INSERT INTO emp' || (v_deptid * 10);
+        v_sql := v_sql || ' VALUES (' || v_empid || ', ''' || v_ename || ''', ''' || v_hdate || ''')';
+        DBMS_OUTPUT.PUT_LINE(v_sql);
+        EXECUTE IMMEDIATE v_sql;
+    ELSE
+        INSERT INTO emp00
+        VALUES (v_empid, v_ename, v_hdate);
+    END IF;    
+END;
+/
+
+/*
+5.
+급여가  5000이하이면 20% 인상된 급여
+급여가 10000이하이면 15% 인상된 급여
+급여가 15000이하이면 10% 인상된 급여
+급여가 15001이상이면 급여 인상없음
+
+사원번호를 입력(치환변수)하면 사원이름, 급여, 인상된 급여가 출력되도록 PL/SQL 블록을 생성하시오
+*/
+
+DECLARE
+    v_ename employees.first_name%TYPE;
+    v_sal employees.salary%TYPE;
+    v_raise NUMBER := 0;
+BEGIN
+    SELECT first_name, salary
+    INTO v_ename, v_sal
+    FROM employees
+    WHERE employee_id = &사원번호;
+    
+    IF v_sal <= 5000 THEN
+        v_raise := 20;
+    ELSIF v_sal <= 10000 THEN
+        v_raise := 15;
+    ELSIF v_sal <= 15000 THEN
+        v_raise := 10;
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('사원이름 : ' || v_ename);
+    DBMS_OUTPUT.PUT_LINE('급여 : ' || v_sal);
+    DBMS_OUTPUT.PUT_LINE('인상된 급여 : ' || (v_sal * (1 + v_raise/100)));
+     
+END;
+/

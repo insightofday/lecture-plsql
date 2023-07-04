@@ -1,0 +1,51 @@
+/*
+3-1.
+사원번호를 입력(치환변수사용&)할 경우
+입사일이 2005년 이후(2005년 포함)이면 'New employee' 출력
+      2005년 이전이면 'Career employee' 출력
+ */
+ 
+DECLARE
+    v_empid employees.employee_id%TYPE := &사원번호;
+    v_hdate employees.hire_date%TYPE;
+BEGIN
+    SELECT hire_date
+    INTO v_hdate
+    FROM employees
+    WHERE employee_id = v_empid;
+    
+    IF v_hdate >= TO_DATE('05-01-01', 'yy-MM-dd') THEN
+        DBMS_OUTPUT.PUT_LINE('New employee');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Careear employee');
+    END IF;
+END;
+/
+
+
+/*
+3-2.
+사원번호를 입력(치환변수사용&)할 경우
+입사일이 2005년 이후(2005년 포함)이면 'New employee' 출력
+      2005년 이전이면 'Career employee' 출력
+단, DBMS_OUTPUT.PUT_LINE ~ 은 한번만 사용
+*/
+DECLARE
+   v_empid employees.employee_id%TYPE := &사원번호;
+   v_hdate employees.hire_date%TYPE;
+   v_message VARCHAR2(100);
+BEGIN
+    SELECT hire_date
+    INTO v_hdate
+    FROM employees
+    WHERE employee_id = v_empid;
+
+    IF TO_CHAR(v_hdate, 'yyyy') > '2004' THEN
+        v_message := 'New employee';
+    ELSE
+        v_message := 'Career employee';
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE(v_message);
+END;
+/

@@ -1,0 +1,50 @@
+/*
+
+1. 다음과 같이 출력되도록 하시오.
+*       -- 첫번재 줄, *가 하나
+**      -- 두번째 줄, *가 두개
+***     -- 세번째 줄, *가 세개
+****    -- 네번째 줄, *가 네개
+*****   -- 다섯번재 줄, *가 다섯개
+
+*/
+
+-- 기본 LOOP
+DECLARE
+    v_tree VARCHAR2(6 char) := ''; -- 각 줄에 출력할 *
+    v_count NUMBER(1,0) := 0;      -- LOOP문 종료조건에 사용할 변수
+BEGIN
+    LOOP
+        v_tree := v_tree || '*';
+        DBMS_OUTPUT.PUT_LINE(v_tree);
+        
+        v_count := v_count + 1;
+        EXIT WHEN v_count > 5;
+    END LOOP;
+END;
+/
+
+-- FOR LOOP
+BEGIN
+    FOR counter IN 1..5 LOOP
+        FOR i IN 1..counter LOOP
+            DBMS_OUTPUT.PUT('*');
+        END LOOP;
+        DBMS_OUTPUT.PUT_LINE('');    
+    END LOOP;
+END;
+/
+
+-- WHILE LOOP
+DECLARE
+    v_tree VARCHAR2(6 char) := ''; -- 각 줄에 출력할 *
+    v_count NUMBER(1,0) := 0;      -- LOOP문 종료조건에 사용할 변수
+BEGIN
+    WHILE v_count <= 5 LOOP
+        v_tree := v_tree || '*';
+        DBMS_OUTPUT.PUT_LINE(v_tree);
+        
+        v_count := v_count + 1;
+    END LOOP;
+END;
+/

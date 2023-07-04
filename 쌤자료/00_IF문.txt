@@ -1,0 +1,30 @@
+4. 
+사원번호를 입력(치환변수& 사용)할 경우
+부서별로 구분하여 각각의 테이블에 입력하는 PL/SQL 블록을 작성하시오.
+단, 해당 부서가 없는 사원은 emp00 테이블에 입력하시오.
+   : 부서번호10->emp10, 부서번호20->emp20 ....
+
+create table emp10(empid, ename, hiredate)
+as
+  select employee_id, first_name, hire_date
+  from   employees
+  where  employee_id = 0;
+
+emp20
+emp30
+emp40
+emp50
+emp00
+
+
+
+
+
+
+5.
+급여가  5000이하이면 20% 인상된 급여
+급여가 10000이하이면 15% 인상된 급여
+급여가 15000이하이면 10% 인상된 급여
+급여가 15001이상이면 급여 인상없음
+
+사원번호를 입력(치환변수)하면 사원이름, 급여, 인상된 급여가 출력되도록 PL/SQL 블록을 생성하시오.

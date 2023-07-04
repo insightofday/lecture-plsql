@@ -1,0 +1,100 @@
+/*
+1.
+사원번호를 입력(치환변수사용&)할 경우
+사원번호, 사원이름, 부서이름  
+을 출력하는 PL/SQL을 작성하시오.
+
+// 입력 : 사원번호                    -> 테이블 : employees    
+// 출력 : 사원번호, 사원이름, 부서이름  -> 테이블 : employees + departments 
+                                    => 조건 : department_id
+*/
+
+-- 1) JOIN
+DECLARE
+    v_empid employees.employee_id%TYPE;
+    v_ename employees.first_name%TYPE;
+    v_deptname departments.department_name%TYPE;
+BEGIN
+    SELECT employee_id, first_name, department_name
+    INTO v_empid, v_ename, v_deptname
+    FROM employees JOIN departments 
+         USING(department_id)
+    WHERE employee_id = &사원번호;
+    
+    DBMS_OUTPUT.PUT_LINE('사원번호 : ' || v_empid);
+    DBMS_OUTPUT.PUT_LINE('사원이름 : ' || v_ename);
+    DBMS_OUTPUT.PUT_LINE('부서이름 : ' || v_deptname);
+END;
+/
+
+-- 2) 두개의 SELECT문
+DECLARE
+    v_empid employees.employee_id%TYPE;
+    v_ename employees.first_name%TYPE;
+    v_deptid employees.department_id%TYPE;
+    v_deptname departments.department_name%TYPE;
+BEGIN
+    SELECT employee_id, first_name, department_id
+    INTO v_empid, v_ename, v_deptid 
+    FROM employees
+    WHERE employee_id = &사원번호;
+    
+    SELECT department_name
+    INTO v_deptname
+    FROM departments
+    WHERE department_id = v_deptid;
+    
+    DBMS_OUTPUT.PUT_LINE('사원번호 : ' || v_empid);
+    DBMS_OUTPUT.PUT_LINE('사원이름 : ' || v_ename);
+    DBMS_OUTPUT.PUT_LINE('부서이름 : ' || v_deptname);    
+END;
+/
+
+
+/*
+2.
+사원번호를 입력(치환변수사용&)할 경우 
+사원이름, 급여, 연봉->(급여*12+(nvl(급여,0)*nvl(커미션퍼센트,0)*12))
+을 출력하는  PL/SQL을 작성하시오.
+
+// 입력 : 사원번호               => 테이블 : employees
+// 출력 : 사원이름, 급여, 연봉    => 컬럼 : 사원이름, 급여, 커미션
+
+*/
+
+-- 1) SELECT문으로 처리
+DECLARE
+    v_ename employees.first_name%TYPE;
+    v_sal  employees.salary%TYPE;
+    v_annual employees.salary%TYPE;
+BEGIN
+    SELECT first_name, salary, (salary * 12 + NVL(salary, 0) * NVL(commission_pct, 0) * 12)
+    INTO v_ename, v_sal, v_annual
+    FROM employees
+    WHERE employee_id = &사원번호;
+    
+    DBMS_OUTPUT.PUT_LINE('사원이름 : ' || v_ename);
+    DBMS_OUTPUT.PUT_LINE('급여 : ' || v_sal);
+    DBMS_OUTPUT.PUT_LINE('연봉 : ' || v_annual);
+END;
+/
+
+-- 2) 별도 연산
+DECLARE
+    v_ename employees.first_name%TYPE;
+    v_sal employees.salary%TYPE;
+    v_comm employees.commission_pct%TYPE;
+    v_annual v_sal%TYPE;
+BEGIN
+    SELECT first_name, salary, commission_pct
+    INTO v_ename, v_sal, v_comm
+    FROM employees
+    WHERE employee_id = &사원번호;
+    
+    v_annual := v_sal * 12 + NVL(v_sal, 0) * NVL(v_comm, 0) * 12;
+    
+    DBMS_OUTPUT.PUT_LINE('사원이름 : ' || v_ename);
+    DBMS_OUTPUT.PUT_LINE('급여 : ' || v_sal);
+    DBMS_OUTPUT.PUT_LINE('연봉 : ' || v_annual);
+END;
+/
