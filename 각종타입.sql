@@ -122,6 +122,14 @@ BEGIN
         emp_table(eid) := emp_record;
     END LOOP;
     
+    for eid in emp_table.first .. emp_table.last loop
+        if emp_table.exists(eid) then
+            dbms_output.put(emp_table(eid).employee_id||', ');
+             dbms_output.put(emp_table(eid).first_name||', ');
+              dbms_output.put_line(emp_table(eid).hire_date);
+        end if;
+    end loop;
     
 END;
 /
+select * from employees order by employee_id;
