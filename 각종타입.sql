@@ -15,7 +15,7 @@ begin
     select employee_id,first_name,salary
     into emp_info
     from employees
-    where employee_id=&»ç¿ø¹øÈ£;
+    where employee_id=&ì‚¬ì›ë²ˆí˜¸;
     
     dbms_output.put(' number;'||emp_info.empno);
     dbms_output.put(' name;'||emp_info.ename);
@@ -29,14 +29,14 @@ begin
     select*
     into emp_record
     from employees
-    where employee_id=&»ç¿ø¹øÈ£;
+    where employee_id=&ì‚¬ì›ë²ˆí˜¸;
     dbms_output.put_line(emp_record.employee_id);
     dbms_output.put_line(emp_record.last_name);
     dbms_output.put_line(emp_record.job_id);
 end;
 /
 
-------------------------------------------------------------------------------------------------Å×ÀÌºí
+------------------------------------------------------------------------------------------------í…Œì´ë¸”
 declare
     type num_table_type is table of number
         index by pls_integer;
@@ -44,14 +44,14 @@ declare
     num_info num_table_type;
 begin
     num_info(10):=1000;
-    --Å©±â°¡ µ¿ÀûÀ¸·Î Á¶ÀıµÇ±â(À½¼ö, ¾ç¼ö ¾È °¡¸®°í Á¤¼öÀÎ ¼ö ¹èÁ¤) ¶§¹®¿¡ ¸Ş¼Òµå·Î Á¢±ÙÇØ¾ß ÇÔ
+    --í¬ê¸°ê°€ ë™ì ìœ¼ë¡œ ì¡°ì ˆë˜ê¸°(ìŒìˆ˜, ì–‘ìˆ˜ ì•ˆ ê°€ë¦¬ê³  ì •ìˆ˜ì¸ ìˆ˜ ë°°ì •) ë•Œë¬¸ì— ë©”ì†Œë“œë¡œ ì ‘ê·¼í•´ì•¼ í•¨
     dbms_output.put_line(num_info(10));
-    
+       
     for idx in 1..10 loop
         num_info(trunc(idx/2)):=idx;
     end loop;
     dbms_output.put_line('');
-    dbms_output.put_line(num_info(0));
+    dbms_output.put_line('ddd'||num_info(0));
     dbms_output.put_line(num_info(1));
 end;
 /
@@ -62,7 +62,7 @@ declare
     num_table num_table_type;
     v_total number(2);
 begin
-    --Á¤¼ö 1¿¡¼­50»çÀÌ¿¡ÀÖ´Â2ÀÇ¹è¼ö¸¦ num_table¿¡´ã°í°¹¼ö¸¦Ãâ·Â
+    --ì •ìˆ˜ 1ì—ì„œ50ì‚¬ì´ì—ìˆëŠ”2ì˜ë°°ìˆ˜ë¥¼ num_tableì—ë‹´ê³ ê°¯ìˆ˜ë¥¼ì¶œë ¥
     for idx in 1..50 loop
         if mod(idx,2)<>0 then
             continue;
@@ -77,7 +77,7 @@ begin
     
     for idx in num_table.first .. num_table.last loop
         if num_table.exists(idx) then
-            --3ÀÇ ¹è¼ö¸¦ »èÁ¦
+            --3ì˜ ë°°ìˆ˜ë¥¼ ì‚­ì œ
             if mod(num_table(idx),3)=0 then
                 num_table.delete(idx);
             else
@@ -88,14 +88,14 @@ begin
     end loop;
 end;
 /
----------------------table¿¹Á¦
+---------------------tableì˜ˆì œ
 DECLARE
-    v_min employees.employee_id%TYPE; --°¡ÀåÀÛÀº»ç¿ø¹øÈ£
-    v_MAX employees.employee_id%TYPE; --°¡ÀåÅ«»õ¿ø¹øÈ£
-    v_result NUMBER(1,0);       --»ç¿øÀÇÁ¸ÀçÀ¯¹«
-    emp_record employees%ROWTYPE; --employeesÀÇÇÑÇà¿¡´ëÀÀ
+    v_min employees.employee_id%TYPE; --ê°€ì¥ì‘ì€ì‚¬ì›ë²ˆí˜¸
+    v_MAX employees.employee_id%TYPE; --ê°€ì¥í°ìƒˆì›ë²ˆí˜¸
+    v_result NUMBER(1,0);       --ì‚¬ì›ì˜ì¡´ì¬ìœ ë¬´
+    emp_record employees%ROWTYPE; --employeesì˜í•œí–‰ì—ëŒ€ì‘
     
-    TYPE emp_table_type IS TABLE OF emp_record%TYPE --º¯¼ö¿¡ ÇÒ´çÇÒ ¶§´Â type¼Ó¼ºÀ¸·Î
+    TYPE emp_table_type IS TABLE OF emp_record%TYPE --ë³€ìˆ˜ì— í• ë‹¹í•  ë•ŒëŠ” typeì†ì„±ìœ¼ë¡œ
         INDEX BY PLS_INTEGER;
     
     emp_table emp_table_type;
@@ -105,7 +105,7 @@ BEGIN
     FROM employees;
     
     FOR eid IN v_min .. v_max LOOP
-        SELECT COUNT(*)--plsql¿¡¼­ 0°ú³ÎÀº Çã¿ëµÇÁö ¾ÊÀ½
+        SELECT COUNT(*)--plsqlì—ì„œ 0ê³¼ë„ì€ í—ˆìš©ë˜ì§€ ì•ŠìŒ
         INTO v_result
         FROM employees
         WHERE employee_id = eid;
