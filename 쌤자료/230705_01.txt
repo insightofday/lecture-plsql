@@ -1,0 +1,124 @@
+/*
+1.
+사원(employees) 테이블에서
+사원의 사원번호, 사원이름, 입사연도를 
+다음 기준에 맞게 각각 test01, test02에 입력하시오.
+입사년도가 2005년(포함) 이전 입사한 사원은 test01 테이블에 입력
+입사년도가 2005년 이후 입사한 사원은 test02 테이블에 입력
+
+*/
+CREATE TABLE test01
+AS
+	SELECT employee_id, first_name, hire_date
+	FROM employees
+	WHERE employee_id = 0;
+	
+CREATE TABLE test02
+AS
+	SELECT employee_id, first_name, hire_date
+	FROM employees
+	WHERE employee_id = 0;
+
+-- 1-1) 명시적 커서 + 기본 LOOP 사용
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT employee_id, first_name, hire_date
+        FROM employees;
+    
+    emp_record emp_cursor%ROWTYPE;
+BEGIN
+    OPEN emp_cursor;
+    
+    LOOP
+        FETCH emp_cursor INTO emp_record;
+        EXIT WHEN emp_cursor%NOTFOUND;
+        -- 커서가 가리키는 한행을 기준으로 실행하고자 하는 부분  
+        IF TO_CHAR(emp_record.hire_date, 'yyyy') <= '2005' THEN
+            INSERT INTO test01 ( employee_id, first_name, hire_date )
+            VALUES ( emp_record.employee_id, emp_record.first_name, emp_record.hire_date );
+        ELSE
+            INSERT INTO test02
+            VALUES emp_record;
+        END IF;  
+    END LOOP;
+    
+    CLOSE emp_cursor;
+
+END;
+/
+
+
+-- 1-2) 커서 FOR LOOP 사용
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT employee_id, first_name, hire_date
+        FROM employees;
+
+BEGIN
+    FOR emp_record IN emp_cursor LOOP        
+       IF TO_CHAR(emp_record.hire_date, 'yyyy') <= '2005' THEN
+            INSERT INTO test01 ( employee_id, first_name, hire_date )
+            VALUES ( emp_record.employee_id, emp_record.first_name, emp_record.hire_date );
+        ELSE
+            INSERT INTO test02
+            VALUES emp_record;
+        END IF;  
+    END LOOP;
+END;
+/
+SELECT * FROM test01;
+SELECT * FROM test02;
+
+/*
+2.
+부서번호를 입력할 경우(&치환변수 사용)
+해당하는 부서의 사원이름, 입사일자, 부서명을 출력하시오.
+(단, cursor 사용)
+*/
+
+-- 기본 LOOP
+DECLARE
+    v_deptid departments.department_id%TYPE := &부서번호;
+    
+    CURSOR dept_emp_cursor IS
+        SELECT first_name, hire_date, department_name
+        FROM employees e JOIN departments d
+          ON e.department_id = d.department_id
+        WHERE e.department_id = v_deptid;
+   
+   emp_info dept_emp_cursor%ROWTYPE;       
+BEGIN
+    OPEN dept_emp_cursor;
+    
+    DBMS_OUTPUT.PUT_LINE('========' || v_deptid || '========');
+    LOOP
+        FETCH dept_emp_cursor INTO emp_info;
+        EXIT WHEN dept_emp_cursor%NOTFOUND;
+        
+        DBMS_OUTPUT.PUT('사원이름 : ' || emp_info.first_name);
+        DBMS_OUTPUT.PUT(', 입사일자 : ' || TO_CHAR(emp_info.hire_date, 'yyyy"년"MM"월"dd"일"'));
+        DBMS_OUTPUT.PUT_LINE(', 부서명 : ' || emp_info.department_name);
+    END LOOP;
+    
+    CLOSE dept_emp_cursor;
+END;
+/
+
+-- 커서 FOR LOOP
+DECLARE
+    v_deptid departments.department_id%TYPE := &부서번호;
+    
+    CURSOR dept_emp_cursor IS
+        SELECT first_name, hire_date, department_name
+        FROM employees e JOIN departments d
+          ON e.department_id = d.department_id
+        WHERE e.department_id = v_deptid;  
+BEGIN
+    DBMS_OUTPUT.PUT_LINE('========' || v_deptid || '========');
+    FOR emp_info IN dept_emp_cursor LOOP     
+        DBMS_OUTPUT.PUT('사원이름 : ' || emp_info.first_name);
+        DBMS_OUTPUT.PUT(', 입사일자 : ' || TO_CHAR(emp_info.hire_date, 'yyyy"년"MM"월"dd"일"'));
+        DBMS_OUTPUT.PUT_LINE(', 부서명 : ' || emp_info.department_name);
+    END LOOP;
+END;
+/
