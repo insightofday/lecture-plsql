@@ -9,30 +9,30 @@ declare
 begin
     open emp_cursor;
     loop
-        fetch emp_cursor into  v_eid,v_ename;--ÇöÀçÄ¿¼­°¡ °¡¸®Å°´Â Çà loadÇØ¼­ º¯¼ö¿¡ ´ëÀÔ
-        exit when emp_cursor%notfound;    --Á¾·áÁ¶°ÇÀº fetch´ÙÀ½¿¡ ºÙÀÌ±â
-         --exit when emp_cursor%rowcount>10;  --¶Ç´Ù¸¥ Á¾·áÁ¶°Ç
+        fetch emp_cursor into  v_eid,v_ename;--í˜„ì¬ì»¤ì„œê°€ ê°€ë¦¬í‚¤ëŠ” í–‰ loadí•´ì„œ ë³€ìˆ˜ì— ëŒ€ì…
+        exit when emp_cursor%notfound;    --ì¢…ë£Œì¡°ê±´ì€ fetchë‹¤ìŒì— ë¶™ì´ê¸°
+         --exit when emp_cursor%rowcount>10;  --ë˜ë‹¤ë¥¸ ì¢…ë£Œì¡°ê±´
         dbms_output.put_line(v_eid||', '||v_ename);
     end loop;
     
     dbms_output.put_line('');
     fetch emp_cursor into  v_eid,v_ename;
     dbms_output.put_line(v_eid||', '||v_ename);
-    --´õÀÌ»ó »õ·Î¿î µ¥ÀÌÅÍ°¡ ¾ø¾î¼­ loop³»ÀÇ fetch³¡³ª¼­ loop³¡³ª°í Ä¿¼­´Â ÀÌµ¿ÇÏÁö ¾ÊÀº Ã¤·Î ½ÇÇàµÊ(¸¶Áö¸·Çà2¹ø½ÇÇà)
+    --ë”ì´ìƒ ìƒˆë¡œìš´ ë°ì´í„°ê°€ ì—†ì–´ì„œ loopë‚´ì˜ fetchëë‚˜ì„œ loopëë‚˜ê³  ì»¤ì„œëŠ” ì´ë™í•˜ì§€ ì•Šì€ ì±„ë¡œ ì‹¤í–‰ë¨(ë§ˆì§€ë§‰í–‰2ë²ˆì‹¤í–‰)
     
     
     
     dbms_output.put_line('');
     dbms_output.put_line(emp_cursor%rowcount);
-    --rowcountÄ¿¼­°¡ ¹İÈ¯µÈ È½¼ö±â ¶§¹®¿¡ À§ÀÇ fetch°¡ ¿µÇâÀ» ¹ÌÄ¡Áö ¸øÇÔ
+    --rowcountì»¤ì„œê°€ ë°˜í™˜ëœ íšŸìˆ˜ê¸° ë•Œë¬¸ì— ìœ„ì˜ fetchê°€ ì˜í–¥ì„ ë¯¸ì¹˜ì§€ ëª»í•¨
     close emp_cursor;
-    --  dbms_output.put_line(emp_cursor%rowcount); rowcountµîÀº closeµÚ¿¡ ¿À¸é ¾ÈµÊ
+    --  dbms_output.put_line(emp_cursor%rowcount); rowcountë“±ì€ closeë’¤ì— ì˜¤ë©´ ì•ˆë¨
 end;
 /
 
---¸ğµç »ç¿øÀÇ »ç¿ø¹øÈ£ ÀÌ¸§ ºÎ¼­ÀÌ¸§ Ãâ·Â
---Ä¿¼­´Â join subquery»ç¿ë°¡´É
---±âº»·çÇÁ¸¦ ¿ì¼±ÀûÀ¸·Î ¾Æ·Î¶ó~~
+--ëª¨ë“  ì‚¬ì›ì˜ ì‚¬ì›ë²ˆí˜¸ ì´ë¦„ ë¶€ì„œì´ë¦„ ì¶œë ¥
+--ì»¤ì„œëŠ” join subqueryì‚¬ìš©ê°€ëŠ¥
+--ê¸°ë³¸ë£¨í”„ë¥¼ ìš°ì„ ì ìœ¼ë¡œ ì•„ë¡œë¼~~
 declare
     cursor emp_cursor is
         select employee_id,first_name,department_name
@@ -54,7 +54,7 @@ end;
 /
 
 
---ºÎ¼­¹øÈ£°¡50ÀÌ°Å³ª80ÀÎ »ç¿øµéÀÇ ÀÌ¸§,±Ş¿©,¿¬ºÀ Ãâ·Â
+--ë¶€ì„œë²ˆí˜¸ê°€50ì´ê±°ë‚˜80ì¸ ì‚¬ì›ë“¤ì˜ ì´ë¦„,ê¸‰ì—¬,ì—°ë´‰ ì¶œë ¥
 declare
     cursor emp_cursor is
         select first_name, salary, nvl(salary,0)*12+nvl(salary,0)*nvl(commission_pct,0)*12 annual
@@ -71,22 +71,175 @@ begin
     close emp_cursor;
 end;
 /
---Ä¿¼­ÀÇ ³»¿ë:»ç¿øÀÌ¸§, ±Ş¿©, Ä¿¹Ì¼ÇÀ¸·Î Á¦ÇÑÇÒ ¶§, À§ÀÇ ¹®Á¦¸¦ Ç®¾îº¸¾Æ¶ó
+--ì»¤ì„œì˜ ë‚´ìš©:ì‚¬ì›ì´ë¦„, ê¸‰ì—¬, ì»¤ë¯¸ì…˜ìœ¼ë¡œ ì œí•œí•  ë•Œ, ìœ„ì˜ ë¬¸ì œë¥¼ í’€ì–´ë³´ì•„ë¼
 declare
     cursor emp_cursor is
-        select first_name, salary, commission_pct annual
+        select employee_id, first_name, salary, commission_pct annual
         from employees
         where department_id in (50,80);
+    v_eid employees.employee_id%type;
     v_name employees.first_name%type;
     v_salary employees.salary%type;
-    v_annual employees.salary%type:=nvl(employees.salary,0)*12+nvl(employees.salary,0)*nvl(employees.commission_pct,0)*12;
+    v_annual v_salary%type;
 begin
     open emp_cursor;
     loop
-        fetch emp_cursor into v_name,v_salary,v_annual;
+        fetch emp_cursor into v_eid, v_name,v_salary,v_annual;
         exit when emp_cursor%notfound;
-         dbms_output.put_line(v_name||','||v_salary||','||v_annual);
+        v_annual:=nvl(v_salary,0)*12+nvl(v_annual,0)*12;
+         dbms_output.put_line(v_eid||v_name||','||v_salary||','||v_annual);
     end loop;
     close emp_cursor;
+end;
+/
+
+
+
+
+-----------------ì»¤ì„œforloop(ì»¤ì„œì— ë°ì´í„°ê°€ ìˆë‹¤ëŠ” ê²ƒì´ í™•ì‹¤í•˜ë‹¤ë©´ ì´ê±¸ ì“°ë©´ ë” í¸ë¦¬í•˜ì§•)
+declare
+    cursor emp_cursor is
+        select employee_id,last_name
+        from employees;
+        
+    cursor dept_emp_cursor is
+        select employee_id,last_name
+        from employees
+        where department_id=&ã…„ë²ˆí˜¸;
+begin
+    for emp_record in emp_cursor loop --emprecordëŠ”forloopë‚´ì—ì„œë§Œì‚¬ìš©ê°€ëŠ¥í•œì„ì‹œë³€ìˆ˜
+        dbms_output.put_line(emp_record.employee_id||emp_record.last_name);
+         dbms_output.put_line(emp_cursor%rowcount);
+         --endloopì „ì— ì‹¤í–‰í•´ì•¼ ì‹¤í–‰ëœ íšŸìˆ˜ë¥¼ ì•Œ ìˆ˜ ìˆìŒ
+    end loop;
+    dbms_output.put_line('');
+    
+    for emp_record in dept_emp_cursor loop
+        --dbms_output.put_line(dept_emp_cursor%notfound);
+        dbms_output.put_line(emp_record.employee_id||emp_record.last_name);
+        dbms_output.put_line(dept_emp_cursor%rowcount);
+        --rowcountëŠ” 0ë„ ë‚˜ì˜¬ ìˆ˜ ìˆìŒ (0~ì–‘ì˜ì •ìˆ˜)
+    end loop;
+end;
+/
+
+--ëª¨ë“  ì‚¬ì›ì˜ ì‚¬ì›ë²ˆí˜¸,ì´ë¦„,ë¶€ì„œì´ë¦„ ì¶œë ¥
+declare
+    cursor emp_cursor is
+        select employee_id,last_name,department_name
+        from employees e join departments d
+            on e.department_id=d.department_id;
+
+begin
+    for emp_record in emp_cursor loop --recordíƒ€ì…ì˜ ë³€ìˆ˜ê°€ for~inì‚¬ì´ì— ìœ„ì¹˜í•¨
+        dbms_output.put_line(emp_record.employee_id||emp_record.last_name||', '||emp_record.department_name);
+    end loop;
+end;
+/
+
+declare
+    cursor emp_cursor is
+        select first_name, salary,nvl(salary,0)*12+nvl(salary,0)*nvl(commission_pct,0)*12 as annual
+        from employees
+        where department_id in(50,80);
+begin
+    for emp_record in emp_cursor loop
+        dbms_output.put_line(emp_record.first_name||','||emp_record.salary||' ì—°ë´‰:'||emp_record.annual);
+        dbms_output.put_line(emp_cursor%rowcount);
+    end loop;
+end;
+/
+----------------- ê°„ë‹¨ver-------------------------
+begin
+    for emp_info in(select last_name from employees) loop 
+        dbms_output.put_line(emp_info.last_name);
+    end loop;
+    
+end;
+/
+
+--ë§¤ê°œë³€ìˆ˜ë¥¼ ì´ìš”í•œ ì»¤ì„œ
+declare
+    cursor emp_cursor (p_mgr employees.manager_id%type) is
+        select* from employees where manager_id=p_mgr;
+    emp_record emp_cursor%rowtype;
+begin
+    open emp_cursor(100);
+    loop
+        fetch emp_cursor into emp_record;
+        exit when emp_cursor%notfound;
+        
+        dbms_output.put_line(emp_record.employee_id||','||emp_record.first_name);
+    end loop;
+    close emp_cursor;
+    
+    dbms_output.put_line('');   
+   
+    for emp_info in emp_cursor(149)loop
+         dbms_output.put_line(emp_info.employee_id||','||emp_info.first_name);
+    end loop;
+    -----1
+     dbms_output.put_line('');   
+    ---------2 1ì´ë‘ 2ë‘ ë˜‘ê°™ìŒ 
+    open emp_cursor(149);
+    loop
+        fetch emp_cursor into emp_record;
+        exit when emp_cursor%notfound;
+        
+        dbms_output.put_line(emp_record.employee_id||','||emp_record.first_name);
+    end loop;
+    close emp_cursor;
+    
+end;
+/
+
+--forupdte,wherecurrentof
+declare
+    cursor sal_info_cursor is
+        select salary,commission_pct from employees
+        where department_id=30
+        --for update nowait;
+        for update of salary,commission_pct nowait;--<<ofë¶™ì´ë©´ íŠ¹ì •columnì— í•´ë‹¹í•˜ëŠ” ê²ƒë§Œ ì ê¸ˆ ì´ ë°©ì‹ì„ ã…Šã…Š
+begin
+    for sal_info in sal_info_cursor loop
+        if sal_info.commission_pct is null then
+            update employees set salary=sal_info.salary*1.1
+            where current of sal_info_cursor;
+        else
+            update employees set salary=sal_info.salary+sal_info.commission_pct
+            where current of sal_info_cursor;
+        end if;
+    end loop;
+end;
+/
+
+
+--ì»¤ì„œë¥¼ ì‚¬ìš©í•´ì„œ employeesì˜ ëª¨ë“  ì •ë³´ë¥¼ í•œ ë³€ìˆ˜ì— ë‹´ì•„ë³´ê·•
+declare
+    cursor emp_cursor is
+        select * from employees;
+    emp_record emp_cursor%rowtype;
+    
+    type emp_table_type is table of emp_cursor%rowtype
+        index by pls_integer;
+    emp_table emp_table_type;    
+begin
+    open emp_cursor;
+    loop
+        fetch emp_cursor into emp_record;
+        exit when emp_cursor%notfound;
+        emp_table(emp_record.employee_id):=emp_record;
+    end loop;
+    close emp_cursor;
+    dbms_output.put_line(emp_table.count);
+    dbms_output.put_line('');
+    
+    for idx in emp_table.first..emp_table.last loop--tableì˜ ë‚´ìš©ì„ í™•ì¸í•˜ê¸° ë•Œë¬¸ì— cursor for loopì•„ë‹˜
+        if not emp_table.exists(idx)then
+            continue;
+        end if;
+        emp_record:=emp_table(idx);
+        dbms_output.put_line(emp_record.employee_id||','||emp_record.first_name);
+    end loop;
 end;
 /
