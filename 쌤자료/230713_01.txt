@@ -1,0 +1,185 @@
+SET SERVEROUTPUT ON
+/* 5) 부서번호 -> 사번, 이름, 급여 */
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT employee_id, first_name, salary
+        FROM employees
+        WHERE department_id = &부서번호;
+    
+    emp_record emp_cursor%ROWTYPE;  
+BEGIN
+    OPEN emp_cursor;
+    
+    LOOP
+        FETCH emp_cursor INTO emp_record;
+        EXIT WHEN emp_cursor%NOTFOUND;
+        
+        DBMS_OUTPUT.PUT_LINE('사원번호 : ' || emp_record.employee_id );
+        DBMS_OUTPUT.PUT_LINE('이름 : ' || emp_record.first_name );
+        DBMS_OUTPUT.PUT_LINE('급여 : ' || emp_record.salary );
+    END LOOP;
+    
+    CLOSE emp_cursor;
+END;
+/
+
+DECLARE
+    CURSOR emp_cursor IS
+        SELECT employee_id, first_name, salary
+        FROM employees
+        WHERE department_id = &부서번호;
+    
+BEGIN
+    FOR emp_info IN emp_cursor LOOP
+        DBMS_OUTPUT.PUT_LINE('사원번호 : ' || emp_info.employee_id );
+        DBMS_OUTPUT.PUT_LINE('이름 : ' || emp_info.first_name );
+        DBMS_OUTPUT.PUT_LINE('급여 : ' || emp_info.salary );
+    END LOOP;
+END;
+/
+
+
+/* 6) PROCEDURE, EXCEPTION */
+CREATE PROCEDURE update_sal
+( p_eid IN employees.employee_id%TYPE,
+  p_raise IN NUMBER )
+IS
+-- 선언부 : 변수, 타입, 커서, 예외사항 정의
+    e_no_emp EXCEPTION;
+BEGIN
+    UPDATE employees
+    SET salary = salary + salary * (p_raise/100)
+    WHERE employee_id = p_eid;
+    
+    IF SQL%ROWCOUNT = 0 THEN
+        RAISE e_no_emp;
+    END IF;
+    
+EXCEPTION
+    WHEN e_no_emp THEN
+        DBMS_OUTPUT.PUT_LINE('No Search Employees!!');
+END;
+/
+
+EXECUTE update_sal(0, 10);
+
+BEGIN
+    update_sal(0, 10);
+END;
+/
+
+/* 7) 0211023234567 */
+CREATE PROCEDURE user_info
+( p_ssn IN VARCHAR2 )
+IS
+    v_val NUMBER(1);
+    v_age NUMBER;
+    v_gender CHAR(2 char);
+BEGIN
+    v_val := SUBSTR(p_ssn, 7, 1); -- 7번째 자리 : 1,2 - 20세기까지 / 3,4 - 21세기부터
+    
+    -- 나이
+    IF v_val IN (1,2) THEN
+        v_age := TO_NUMBER(TO_CHAR(sysdate, 'yyyy')) - TO_NUMBER(( '19' || SUBSTR(p_ssn, 1, 2)));
+    ELSIF v_val IN (3,4) THEN
+        v_age := TO_NUMBER(TO_CHAR(sysdate, 'yyyy')) - TO_NUMBER(( '20' || SUBSTR(p_ssn, 1, 2)));
+    END IF;
+    
+    -- 성별
+    IF v_val IN (1,3) THEN
+        v_gender := '남자';
+    ELSIF v_val IN(2,4) THEN
+        v_gender := '여자';
+    END IF;
+    
+    DBMS_OUTPUT.PUT_LINE('나이 : ' || v_age);
+    DBMS_OUTPUT.PUT_LINE('성별 : ' || v_gender);
+END;
+/
+
+EXECUTE user_info('0211023234567');
+
+/* 8) 근무하는 기간 : 년 개월차 */
+
+-- 년
+SELECT TRUNC(MONTHS_BETWEEN(sysdate, hire_date)/12)
+FROM employees;
+
+-- 개월차
+SELECT TRUNC(MOD(MONTHS_BETWEEN(sysdate, hire_date), 12))
+FROM employees;
+
+CREATE FUNCTION get_hire_year
+( p_eid employees.employee_id%TYPE )
+RETURN NUMBER
+IS
+    v_hire_year NUMBER;
+BEGIN
+    SELECT TRUNC(MONTHS_BETWEEN(sysdate, hire_date)/12)
+    INTO v_hire_year
+    FROM employees
+    WHERE employee_id = p_eid;
+    
+    RETURN v_hire_year;
+END;
+/
+
+SELECT employee_id, get_hire_year(employee_id)
+FROM employees;
+
+-- 서브쿼리 : SQL문 안에 존재하는 SELECT문 -> 결과가 단건
+/* 9)  부서이름 -> 부서 책임자 이름
+       1) departments : 부서이름 -> 부서 책임자 번호
+       2) employees  : 부서 책임자 번호 == 사원번호 -> first_name
+*/
+-- 1
+SELECT manager_id
+FROM departments
+WHERE department_id = &부서번호;
+
+-- 2
+SELECT first_name
+FROM employees
+WHERE employee_id = (SELECT manager_id
+                     FROM departments
+                     WHERE department_id = 10);
+
+CREATE FUNCTION get_dept_manager
+(p_deptname departments.department_name%TYPE)
+RETURN VARCHAR2
+IS
+    v_dept_mgr employees.first_name%TYPE;
+BEGIN
+    SELECT first_name
+    INTO v_dept_mgr
+    FROM employees
+    WHERE employee_id = (SELECT manager_id
+                         FROM departments
+                         WHERE department_name = p_deptname);
+    
+    RETURN v_dept_mgr;
+END;
+/
+
+SELECT department_name, get_dept_manager(department_name)
+FROM departments;
+
+/* 11) */
+DECLARE
+    v_star VARCHAR2(100) := '';
+    v_print VARCHAR2(100);
+BEGIN
+    FOR i IN 1 .. 9 LOOP
+        v_star := v_star || '*';
+        v_print := LPAD(v_star, 10, '-');
+        DBMS_OUTPUT.PUT_LINE(v_print);
+    END LOOP;
+END;
+/
+
+
+
+
+
+
+
